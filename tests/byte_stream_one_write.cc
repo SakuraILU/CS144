@@ -10,6 +10,7 @@ int main() {
     try {
         {
             ByteStreamTestHarness test{"write-end-pop", 15};
+	    cout << "here"<< endl;
 
             test.execute(Write{"cat"});
 
