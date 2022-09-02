@@ -10,83 +10,83 @@ using namespace std;
 
 int main() {
     try {
-        {
-            ReassemblerTestHarness test{65000};
+        // {
+        //     ReassemblerTestHarness test{65000};
 
-            test.execute(BytesAssembled(0));
-            test.execute(BytesAvailable(""));
-            test.execute(NotAtEof{});
-        }
+        //     test.execute(BytesAssembled(0));
+        //     test.execute(BytesAvailable(""));
+        //     test.execute(NotAtEof{});
+        // }
 
-        {
-            ReassemblerTestHarness test{65000};
+        // {
+        //     ReassemblerTestHarness test{65000};
 
-            test.execute(SubmitSegment{"a", 0});
+        //     test.execute(SubmitSegment{"a", 0});
 
-            test.execute(BytesAssembled(1));
-            test.execute(BytesAvailable("a"));
-            test.execute(NotAtEof{});
-        }
+        //     test.execute(BytesAssembled(1));
+        //     test.execute(BytesAvailable("a"));
+        //     test.execute(NotAtEof{});
+        // }
 
-        {
-            ReassemblerTestHarness test{65000};
+        // {
+        //     ReassemblerTestHarness test{65000};
 
-            test.execute(SubmitSegment{"a", 0}.with_eof(true));
+        //     test.execute(SubmitSegment{"a", 0}.with_eof(true));
 
-            test.execute(BytesAssembled(1));
-            test.execute(BytesAvailable("a"));
-            test.execute(AtEof{});
-        }
+        //     test.execute(BytesAssembled(1));
+        //     test.execute(BytesAvailable("a"));
+        //     test.execute(AtEof{});
+        // }
 
-        {
-            ReassemblerTestHarness test{65000};
+        // {
+        //     ReassemblerTestHarness test{65000};
 
-            test.execute(SubmitSegment{"", 0}.with_eof(true));
+        //     test.execute(SubmitSegment{"", 0}.with_eof(true));
 
-            test.execute(BytesAssembled(0));
-            test.execute(BytesAvailable(""));
-            test.execute(AtEof{});
-        }
+        //     test.execute(BytesAssembled(0));
+        //     test.execute(BytesAvailable(""));
+        //     test.execute(AtEof{});
+        // }
 
-        {
-            ReassemblerTestHarness test{65000};
+        // {
+        //     ReassemblerTestHarness test{65000};
 
-            test.execute(SubmitSegment{"b", 0}.with_eof(true));
+        //     test.execute(SubmitSegment{"b", 0}.with_eof(true));
 
-            test.execute(BytesAssembled(1));
-            test.execute(BytesAvailable("b"));
-            test.execute(AtEof{});
-        }
+        //     test.execute(BytesAssembled(1));
+        //     test.execute(BytesAvailable("b"));
+        //     test.execute(AtEof{});
+        // }
 
-        {
-            ReassemblerTestHarness test{65000};
+        // {
+        //     ReassemblerTestHarness test{65000};
 
-            test.execute(SubmitSegment{"", 0});
+        //     test.execute(SubmitSegment{"", 0});
 
-            test.execute(BytesAssembled(0));
-            test.execute(BytesAvailable(""));
-            test.execute(NotAtEof{});
-        }
+        //     test.execute(BytesAssembled(0));
+        //     test.execute(BytesAvailable(""));
+        //     test.execute(NotAtEof{});
+        // }
 
-        {
-            ReassemblerTestHarness test{8};
+        // {
+        //     ReassemblerTestHarness test{8};
 
-            test.execute(SubmitSegment{"abcdefgh", 0});
+        //     test.execute(SubmitSegment{"abcdefgh", 0});
 
-            test.execute(BytesAssembled(8));
-            test.execute(BytesAvailable{"abcdefgh"});
-            test.execute(NotAtEof{});
-        }
+        //     test.execute(BytesAssembled(8));
+        //     test.execute(BytesAvailable{"abcdefgh"});
+        //     test.execute(NotAtEof{});
+        // }
 
-        {
-            ReassemblerTestHarness test{8};
+        // {
+        //     ReassemblerTestHarness test{8};
 
-            test.execute(SubmitSegment{"abcdefgh", 0}.with_eof(true));
+        //     test.execute(SubmitSegment{"abcdefgh", 0}.with_eof(true));
 
-            test.execute(BytesAssembled(8));
-            test.execute(BytesAvailable{"abcdefgh"});
-            test.execute(AtEof{});
-        }
+        //     test.execute(BytesAssembled(8));
+        //     test.execute(BytesAvailable{"abcdefgh"});
+        //     test.execute(AtEof{});
+        // }
 
         {
             ReassemblerTestHarness test{8};
@@ -101,41 +101,41 @@ int main() {
             test.execute(AtEof{});
         }
 
-        {
-            ReassemblerTestHarness test{8};
+        // {
+        //     ReassemblerTestHarness test{8};
 
-            test.execute(SubmitSegment{"abc", 0});
-            test.execute(BytesAssembled(3));
-            test.execute(NotAtEof{});
+        //     test.execute(SubmitSegment{"abc", 0});
+        //     test.execute(BytesAssembled(3));
+        //     test.execute(NotAtEof{});
 
-            test.execute(SubmitSegment{"ghX", 6}.with_eof(true));
-            test.execute(BytesAssembled(3));
-            test.execute(NotAtEof{});
+        //     test.execute(SubmitSegment{"ghX", 6}.with_eof(true));
+        //     test.execute(BytesAssembled(3));
+        //     test.execute(NotAtEof{});
 
-            test.execute(SubmitSegment{"cdefg", 2});
-            test.execute(BytesAssembled(8));
-            test.execute(BytesAvailable{"abcdefgh"});
-            test.execute(NotAtEof{});
-        }
+        //     test.execute(SubmitSegment{"cdefg", 2});
+        //     test.execute(BytesAssembled(8));
+        //     test.execute(BytesAvailable{"abcdefgh"});
+        //     test.execute(NotAtEof{});
+        // }
 
-        // credit for test: Bill Lin (2020)
-        {
-            ReassemblerTestHarness test{8};
+        // // credit for test: Bill Lin (2020)
+        // {
+        //     ReassemblerTestHarness test{8};
 
-            test.execute(SubmitSegment{"abc", 0});
-            test.execute(BytesAssembled(3));
-            test.execute(NotAtEof{});
+        //     test.execute(SubmitSegment{"abc", 0});
+        //     test.execute(BytesAssembled(3));
+        //     test.execute(NotAtEof{});
 
-            // Stream re-assembler should ignore empty segments
-            test.execute(SubmitSegment{"", 6});
-            test.execute(BytesAssembled(3));
-            test.execute(NotAtEof{});
+        //     // Stream re-assembler should ignore empty segments
+        //     test.execute(SubmitSegment{"", 6});
+        //     test.execute(BytesAssembled(3));
+        //     test.execute(NotAtEof{});
 
-            test.execute(SubmitSegment{"de", 3}.with_eof(true));
-            test.execute(BytesAssembled(5));
-            test.execute(BytesAvailable("abcde"));
-            test.execute(AtEof{});
-        }
+        //     test.execute(SubmitSegment{"de", 3}.with_eof(true));
+        //     test.execute(BytesAssembled(5));
+        //     test.execute(BytesAvailable("abcde"));
+        //     test.execute(AtEof{});
+        // }
     } catch (const exception &e) {
         cerr << "Exception: " << e.what() << endl;
         return EXIT_FAILURE;

@@ -4,16 +4,50 @@
 #include "byte_stream.hh"
 
 #include <cstdint>
+#include <iostream>
+#include <map>
 #include <string>
 
+using namespace std;
 //! \brief A class that assembles a series of excerpts from a byte stream (possibly out of order,
 //! possibly overlapping) into an in-order byte stream.
 class StreamReassembler {
   private:
     // Your code here -- add private members as necessary.
+    struct Segment {
+        bool _eof;
+        std::string _data;
+        size_t _len;
+
+        Segment(bool eof, std::string str = "") : _eof(eof), _data(str), _len(str.size()) {}
+
+        Segment &operator+=(const Segment &other) {
+            _data += other._data;
+            _len += other._len;
+            _eof = other._eof;
+            return *this;
+        }
+
+        void erase_front(int n) {
+            _data.erase(0, n);
+            n = std::max<int>(0, n);
+            _len -= n;
+        }
+
+        void erase_back(int n) {
+            // cout << _data.size() << endl;
+            _data.erase(max<int>(0, _data.size() - n), n);
+            // std::cout << "string after erase is " << _data << std::endl;
+            n = std::max<int>(0, n);
+            _len -= n;
+        }
+    };
 
     ByteStream _output;  //!< The reassembled in-order byte stream
     size_t _capacity;    //!< The maximum number of bytes
+    size_t _unreassm_bytes;
+
+    std::map<size_t, Segment> _segments;
 
   public:
     //! \brief Construct a `StreamReassembler` that will store up to `capacity` bytes.
