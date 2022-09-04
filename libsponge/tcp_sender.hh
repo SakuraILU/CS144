@@ -6,6 +6,7 @@
 #include "tcp_segment.hh"
 #include "wrapping_integers.hh"
 
+#include <assert.h>
 #include <functional>
 #include <queue>
 
@@ -20,17 +21,34 @@ class TCPSender {
     //! our initial sequence number, the number for our SYN.
     WrappingInt32 _isn;
 
-    //! outbound queue of segments that the TCPSender wants sent
+    //! outbound queue ]of segments that the TCPSender wants sent
     std::queue<TCPSegment> _segments_out{};
+    std::queue<TCPSegment> _segments_buffer{};
 
     //! retransmission timer for the connection
     unsigned int _initial_retransmission_timeout;
+    unsigned int _retransmission_timeout;
+
+    //! consecutive retransmission count for the same segment
+    unsigned int _retransmission_cnt;
 
     //! outgoing stream of bytes that have not yet been sent
     ByteStream _stream;
 
     //! the (absolute) sequence number for the next byte to be sent
     uint64_t _next_seqno{0};
+
+    bool _is_syn{false};
+    bool _is_fin{false};
+    size_t _window_size{1};
+    WrappingInt32 _ackno{0};
+    uint64_t _ackno_checkpoint{0};
+
+    uint64_t _byte_in_flight{0};
+
+    size_t _timer{0};
+
+    void send_segment(TCPSegment segment);
 
   public:
     //! Initialize a TCPSender
