@@ -10,29 +10,32 @@ void DUMMY_CODE(Targs &&.../* unused */) {}
 
 using namespace std;
 
-void TCPReceiver::segment_received(const TCPSegment &seg) {
+bool TCPReceiver::segment_received(const TCPSegment &seg) {
     // extract head of the segment
     TCPHeader head = seg.header();
 
     // if has syn signal
     if (head.syn) {
         if (_is_syn)  // return to refuse resyn...may be some error occur in the sender side?
-            return;
+            return false;
         _is_syn = true;
         _isn = head.seqno;  // isn: the initial of seqno
         _checkpoint = 0;    // checkpoint: last absolute index
         _ackno = _isn + 1;  // ackno: next seqno we want to receive
-        // cout << _isn.raw_value() << "--" << _ackno.raw_value() << endl;
     }
     // if not syn yet, just return to refuse the segment
     if (!_is_syn)
-        return;
+        return false;
 
     // extract payload, convert(unwrap) seqno to absolute index and set eof according to head.fin signal
     std::string payload = seg.payload().copy();  // copy() method turn Buffer to string
     uint64_t abs_index = unwrap(head.seqno + (head.syn == true), _isn, _checkpoint);
     bool eof = (head.fin) ? true : false;
+    // cout << "abs index:" << abs_index << endl;
     // push payload to reassembler
+    if (abs_index == 0)  // some index may fail to translate can cause abs_index = 0,
+        return false;    //  thus abs_index - 1 become max_uint64_t
+
     _reassembler.push_substring(payload, abs_index - 1, eof);
 
     // get next index we want (first byte in unreassembler field) and convert(wrap) it to seqno
@@ -61,6 +64,8 @@ void TCPReceiver::segment_received(const TCPSegment &seg) {
         _ackno = _ackno + 1;
 
     _checkpoint = abs_index;
+
+    return true;
 }
 
 // ackno      : unreassemble filed start seqno

@@ -58,6 +58,8 @@ void EventLoop::add_rule(const FileDescriptor &fd,
 //! because [poll(2)](\ref man2::poll) is level triggered, so failing to act on a ready file descriptor
 //! will result in a busy loop (poll returns on a ready file descriptor; file descriptor is not read or
 //! written, so it is still ready; the next call to poll will immediately return).
+#include <iostream>
+
 EventLoop::Result EventLoop::wait_next_event(const int timeout_ms) {
     vector<pollfd> pollfds{};
     pollfds.reserve(_rules.size());
@@ -66,6 +68,7 @@ EventLoop::Result EventLoop::wait_next_event(const int timeout_ms) {
     // set up the pollfd for each rule
     for (auto it = _rules.cbegin(); it != _rules.cend();) {  // NOTE: it gets erased or incremented in loop body
         const auto &this_rule = *it;
+
         if (this_rule.direction == Direction::In && this_rule.fd.eof()) {
             // no more reading on this rule, it's reached eof
             this_rule.cancel();

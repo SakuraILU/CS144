@@ -5,6 +5,13 @@ zhihu-tags: CS144, 计算机网络, 实验
 zhihu-url: https://zhuanlan.zhihu.com/p/558611672
 ---
 
+## Lab 的个人实现的代码的 Github 仓库（目前更新至 LAB3，仅供参考）
+
+My CS144_lab Github Repository：https://github.com/SakuraILU/CS144_lab
+
+随缘写实验记录，预计在 Lab4 完成后会完整写一下 TCP 的部分。
+目前思路写在注释里，之后写了实验记录后会适当删除一些 comments
+
 ## 实验资料
 
 主要资料如下

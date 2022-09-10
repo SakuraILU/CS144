@@ -230,6 +230,14 @@ if ! wait; then
     exit 1
 fi
 
+#echo "input file"
+#cat ${TEST_IN_FILE}
+#echo "output file"
+#cat ${TEST_OUT_FILE}
+#cat ${TEST_IN_FILE}  > ${TEST_OUT_FILE}
+#cat ${TEST_OUT_FILE}
+#cat ${TEST_OUT2_FILE}
+
 HASH_OUT=$(hash_file ${TEST_OUT_FILE})
 if [ ! -z "${HASH_OUT2}" ] && [ "${HASH_OUT}" != "${HASH_OUT2}" ] || [ "${HASH_IN}" != "${HASH_OUT}" ]; then
     echo ERROR: "$HASH_IN" neq "$HASH_OUT" or "$HASH_OUT2"

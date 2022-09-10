@@ -46,7 +46,6 @@ int main() {
             test_2.execute(ExpectNoSegment{});
 
             test_2.execute(ExpectState{State::TIME_WAIT});
-
             test_2.execute(Tick(10 * cfg.rt_timeout - 1));
 
             test_2.execute(ExpectState{State::TIME_WAIT});

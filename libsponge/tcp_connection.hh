@@ -1,6 +1,7 @@
 #ifndef SPONGE_LIBSPONGE_TCP_FACTORED_HH
 #define SPONGE_LIBSPONGE_TCP_FACTORED_HH
 
+#include "assert.h"
 #include "tcp_config.hh"
 #include "tcp_receiver.hh"
 #include "tcp_sender.hh"
@@ -20,6 +21,32 @@ class TCPConnection {
     //! for 10 * _cfg.rt_timeout milliseconds after both streams have ended,
     //! in case the remote TCPConnection doesn't know we've received its whole stream?
     bool _linger_after_streams_finish{true};
+
+    size_t _time_since_last_segment_received{0};
+
+    bool _active{true};
+    WrappingInt32 _ackno{0};
+    size_t _window_size{0};
+
+    enum {
+        CLOSE = 0,
+        SYN_SENT,
+        SYN_ACKED,
+        // FIN_SENT,
+        // FIN_ACKED,
+        LISTEN = 100,
+        SYN_RECV,
+        ESTABLISHED,
+        // FIN_RECV,
+    } _state{LISTEN};
+
+    bool send_all_segments(bool receive_msg = true);
+    void send_ack_segment();
+
+    void add_ack_information(TCPSegment &segment);
+
+    void unclean_shutdown();
+    void clean_shutdown_if_possible();
 
   public:
     //! \name "Input" interface for the writer

@@ -53,6 +53,7 @@ int main() {
         TCPConfig cfg{};
         const WrappingInt32 base_seq(1 << 31);
 
+        cout << "checkpoint 1" << endl;
         // test #1: in ESTABLISHED, send unacceptable segments and ACKs
         {
             cerr << "Test 1" << endl;
@@ -99,6 +100,7 @@ int main() {
             test_1.send_rst(base_seq + 1);
             test_1.execute(ExpectState{State::RESET});
         }
+        cout << "checkpoint 2" << endl;
 
         // test #2: in LISTEN, send RSTs
         {
@@ -113,6 +115,8 @@ int main() {
             test_2.execute(ExpectNoSegment{}, "test 2 failed: RST was not ignored in LISTEN");
         }
 
+        cout << "checkpoint 3" << endl;
+
         // test 3: ACKs in LISTEN
         cerr << "Test 3" << endl;
         ack_listen_test(cfg, base_seq, base_seq, __LINE__);
@@ -125,6 +129,8 @@ int main() {
         ack_listen_test(cfg, base_seq + cfg.recv_capacity, base_seq, __LINE__);
         ack_listen_test(cfg, base_seq + cfg.recv_capacity, base_seq + cfg.recv_capacity, __LINE__);
 
+        cout << "checkpoint 4" << endl;
+
         // test 4: ACK and RST in SYN_SENT
         {
             cerr << "Test 4" << endl;
@@ -136,6 +142,8 @@ int main() {
             test_4.execute(ExpectState{State::RESET});
             test_4.execute(ExpectNoSegment{}, "test 4 failed: RST with good ackno should RESET the connection");
         }
+
+        cout << "checkpoint 5" << endl;
 
         // test 5: ack/rst in SYN_SENT
         cerr << "Test 5" << endl;

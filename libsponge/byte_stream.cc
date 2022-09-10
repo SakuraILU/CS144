@@ -17,9 +17,16 @@ ByteStream::ByteStream(const size_t capacity)
     : _buffer(std::string()), _total_capacity(capacity), _read_bytes(0), _write_bytes(0), _end_input(false) {}
 
 size_t ByteStream::write(const string &data) {
+    // after end input, no more data should be accepted......
+    if (_end_input)
+        return 0;
+
     size_t write_len = min<size_t>(_total_capacity - _buffer.size(), data.size());
+    // cerr << "total: " << _total_capacity << "buffer size: " << _buffer.size() << endl;
     if (write_len == 0)
         return 0;
+
+    // cerr << "-->stream " << data.substr(0, write_len) << endl;
 
     _buffer += data.substr(0, write_len);
 
@@ -47,6 +54,7 @@ void ByteStream::pop_output(const size_t len) {
 std::string ByteStream::read(const size_t len) {
     string str = peek_output(len);
     pop_output(len);
+    // cerr << "read str " << str << endl;
 
     return str;
 }

@@ -34,6 +34,7 @@ void TCPSender::fill_window() {
     // Method >>). although lab2 has strang test cases like: one segment contains syn, payload and fin at the same
     // time...
     // Lab guide also note: initially, assume window space is 1, means just send 1 btye syn signal...
+    // cout << " fill window: " << _is_syn << endl;
     if (!_is_syn) {
         TCPSegment segment;
         TCPHeader &head = segment.header();
@@ -72,6 +73,9 @@ void TCPSender::fill_window() {
     // send this field by segments to fill the window of receiver...
     size_t remain_size =
         _window_size + (_window_size == 0) - (next_seqno_absolute() - unwrap(_ackno, _isn, _ackno_checkpoint));
+    // cout << "window size " << _window_size << " next seqno " << next_seqno_absolute() << " ackno "
+    //      << unwrap(_ackno, _isn, _ackno_checkpoint) << endl;
+    // cout << "stream is end? " << _stream.eof() << endl;
     while (remain_size > 0) {
         // init a tcp segment and get it's head and payload BY REFERENCE!!
         TCPSegment segment;
@@ -95,6 +99,7 @@ void TCPSender::fill_window() {
             _next_seqno += 1;
         }
 
+        // cout << "send data: " << segment.payload().str() << endl;
         send_segment(segment);
 
         if (_stream.buffer_empty())
@@ -153,19 +158,21 @@ void TCPSender::ack_received(const WrappingInt32 ackno, const uint16_t window_si
 void TCPSender::tick(const size_t ms_since_last_tick) {
     if (_segments_buffer.empty())
         return;
-
+    // cout << "time is " << _timer << " set clock to " << _retransmission_timeout << " win size " << _window_size <<
+    // endl;
     _timer += ms_since_last_tick;
     if (_timer >= _retransmission_timeout) {
+        // cout << "tick " << endl;
         // if timeout, network seems very congested, double retransmission time to reduce network flow...
         // but if window size is 0, really want to know when win_size is nonzeron, so don't double retans_timeout...
         _retransmission_cnt++;
         _retransmission_timeout = (_window_size > 0) ? 2 * _retransmission_timeout : _retransmission_timeout;
-
+        // cout << "timeout " << _retransmission_timeout << endl;
         _segments_out.push(_segments_buffer.front());  // try to send the frontest buffered segment
         _timer = 0;                                    // restart timer again...
     }
 }
-
+//
 // how many timeout occurs between two ackno received..
 // use it to adjust newtwork congestion or something...
 unsigned int TCPSender::consecutive_retransmissions() const { return _retransmission_cnt; }
@@ -173,7 +180,7 @@ unsigned int TCPSender::consecutive_retransmissions() const { return _retransmis
 void TCPSender::send_empty_segment() {
     TCPSegment segment;
     segment.header().seqno = next_seqno();
-    _segments_buffer.push(segment);
+    _segments_out.push(segment);
 }
 
 // TCPSender is responsible to convert byte_stream to segments...
@@ -184,5 +191,4 @@ void TCPSender::send_segment(TCPSegment segment) {
     _segments_out.push(segment);     // buffer this segment meanwhile
 
     _byte_in_flight += segment.length_in_sequence_space();  // send new segment, so update bytes_in_flight
-                                                            // they are send but not acked bytes
 }

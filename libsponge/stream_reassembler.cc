@@ -24,11 +24,13 @@ using namespace std;
 
 void StreamReassembler::push_substring(const string &data, const size_t index, const bool eof) {
     int truc_len = _output.bytes_read() + _capacity - index;
+    if (truc_len <= 0 && !eof)
+        return;
+
     size_t seg_index = index;
     string data_truc = data.substr(0, max<int>(0, truc_len));
 
     Segment segment(eof, data_truc);
-    // cout << segment._eof << endl;
     // itr_left: refer to the left connected neighbor
     // itr_right: refer to the right connected neighbor
     map<size_t, Segment>::iterator itr_left = _segments.end(), itr_right = _segments.end();
@@ -37,8 +39,9 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
     auto itr = _segments.begin();
     while (itr != _segments.end()) {
         size_t l = itr->first, r = itr->first + itr->second._len;
-        // printf("segment: %ld, %ld\n", seg_l, seg_r);
-        // printf("itr: %ld,%ld\n", l, r);
+        // cout << seg_l << endl;
+        // fprintf(stderr, "segment: %ld, %ld\n", seg_l, seg_r);
+        // fprintf(stderr, "itr: %ld,%ld\n", l, r);
         if (l <= seg_l) {
             if (r < seg_l) {
                 //          [ segment )
@@ -117,12 +120,9 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
 
     map<size_t, Segment>::iterator itr_merged;
     // if has a left connected neighbor, merge segment with it
-    // cout << "merge left eof is " << itr->second._eof << endl;
     if (itr_left != _segments.end()) {
         itr_left->second += segment;
         // if also has a right connected neighbor, merge segment with it
-        // cout << "merge left eof is " << segment._eof << endl;
-        // cout << "merge left eof is " << itr->second._eof << endl;
         if (itr_right != _segments.end()) {
             itr_left->second += itr_right->second;
             _segments.erase(itr_right);
@@ -145,13 +145,15 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
     // indicates that the reassemblered stream is updated in this merge operation,
     // write the string in itr_merged to _output stream and clear it.
     if (itr_merged == _segments.begin() && itr_merged->first == 0) {
-        if (itr_merged->second._eof) {
-            // cout << "end" << endl;
-            _output.end_input();
-        }
         _output.write(itr_merged->second._data);
         _unreassm_bytes -= itr_merged->second._data.size();
         itr_merged->second._data.clear();
+
+        // if segment with eof is reassembled, all the segments is processed,
+        // thus end the byte stream
+        if (itr_merged->second._eof) {
+            _output.end_input();
+        }
     }
 
     return;
