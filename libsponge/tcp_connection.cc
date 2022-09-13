@@ -202,7 +202,7 @@ bool TCPConnection::send_all_segments(bool receive_msg) {
         // add receiver's ack, ackno and winsize information to the segments
         add_ack_information(segment);
 
-        _segments_out.push(segment);
+        _segments_out.push(std::move(segment));
         _sender.segments_out().pop();
     }
 

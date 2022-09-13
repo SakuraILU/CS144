@@ -186,7 +186,7 @@ void TCPSender::send_empty_segment() {
 // TCPSender is responsible to convert byte_stream to segments...
 // Actually, send_segment means to put the segment to segments_out queue.
 // The segments in this queue will be sent by TCPConnection later.
-void TCPSender::send_segment(TCPSegment segment) {
+void TCPSender::send_segment(const TCPSegment segment) {
     _segments_buffer.push(segment);  // send segment
     _segments_out.push(segment);     // buffer this segment meanwhile
 

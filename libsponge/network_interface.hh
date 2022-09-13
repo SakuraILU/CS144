@@ -1,12 +1,15 @@
 #ifndef SPONGE_LIBSPONGE_NETWORK_INTERFACE_HH
 #define SPONGE_LIBSPONGE_NETWORK_INTERFACE_HH
 
+#include "arp_message.hh"
 #include "ethernet_frame.hh"
 #include "tcp_over_ip.hh"
 #include "tun.hh"
 
 #include <optional>
 #include <queue>
+#include <unordered_map>
+#include <vector>
 
 //! \brief A "network interface" that connects IP (the internet layer, or network layer)
 //! with Ethernet (the network access layer, or link layer).
@@ -31,6 +34,22 @@
 //! and learns or replies as necessary.
 class NetworkInterface {
   private:
+    struct DgramInfo {
+        IPv4Datagram _dgram;
+        uint32_t _next_hop_ip;
+        DgramInfo(const IPv4Datagram &dgram, const uint32_t next_hop_ip) : _dgram(dgram), _next_hop_ip(next_hop_ip) {}
+    };
+
+    struct Timer {
+        bool _is_pending;
+        size_t _timer;
+        std::vector<IPv4Datagram> _dgrams;
+
+        Timer(bool is_pending = true) : _is_pending(is_pending), _timer(0), _dgrams(std::vector<IPv4Datagram>()) {}
+    };
+
+    enum { NO_PENDING, PENDING };
+
     //! Ethernet (known as hardware, network-access-layer, or link-layer) address of the interface
     EthernetAddress _ethernet_address;
 
@@ -39,6 +58,13 @@ class NetworkInterface {
 
     //! outbound queue of Ethernet frames that the NetworkInterface wants sent
     std::queue<EthernetFrame> _frames_out{};
+
+    std::unordered_map<uint32_t, EthernetAddress> _ip2ethernet{};
+    std::unordered_map<uint32_t, Timer> _timers{};
+
+    void reset_clock(uint32_t next_hop_ip, bool is_pending);
+
+    void send_dgrams_in_buffer(const ARPMessage &arp);
 
   public:
     //! \brief Construct a network interface with given Ethernet (network-access-layer) and IP (internet-layer) addresses

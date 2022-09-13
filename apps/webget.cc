@@ -13,7 +13,7 @@ void get_URL(const string &host, const string &path) {
     HTTP_request += "Connection: close\r\n";
     HTTP_request += "\r\n";
 
-    CS144TCPSocket c_sk;
+    FullStackSocket c_sk;
     Address s_addr(host, "http");
     c_sk.connect(s_addr);
     c_sk.write(HTTP_request);

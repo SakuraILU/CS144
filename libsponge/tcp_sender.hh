@@ -48,7 +48,7 @@ class TCPSender {
 
     size_t _timer{0};
 
-    void send_segment(TCPSegment segment);
+    void send_segment(const TCPSegment segment);
 
   public:
     //! Initialize a TCPSender

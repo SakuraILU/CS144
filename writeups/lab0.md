@@ -5,7 +5,7 @@ zhihu-tags: CS144, 计算机网络, 实验
 zhihu-url: https://zhuanlan.zhihu.com/p/558611672
 ---
 
-## Lab 的个人实现的代码的 Github 仓库（目前更新至 LAB3，仅供参考）
+## Lab 的个人实现的代码的 Github 仓库（目前更新至 LAB4, 通过了所以测试用例，代码仅供交流）
 
 My CS144_lab Github Repository：https://github.com/SakuraILU/CS144_lab
 
