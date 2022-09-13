@@ -121,6 +121,8 @@ optional<InternetDatagram> NetworkInterface::recv_frame(const EthernetFrame &fra
             frame_reply.header().type = EthernetHeader::TYPE_ARP;
             frame_reply.payload() = arp.serialize();
             _frames_out.push(std::move(frame_reply));
+
+            send_dgrams_in_buffer(arp);
         }
     }
     return dgram;
