@@ -4,9 +4,14 @@
 
 using namespace std;
 
+// Note: if len is 0, meaning don't need to compare any bytes, just match!
+//       this is also fixed a possible fault: n bytes data is supposed move (n-1) bytes right...
+//       it's actually a complier error, but i don't know why this marco can prevent the complier from discovering it
+//
+//       this makes me misunderstand in the test case that this is always a deafault router in route_table,
+//       but actually, it's default router bcz it's prefix length is 0......oh..
 #define PREFIX(ip, len) (ip >> (sizeof(uint32_t) * 8 - len))
-#define MATCH(ip1, ip2, len) (PREFIX(ip1, len) == PREFIX(ip2, len))
-// Dummy implementation of an IP router
+#define MATCH(ip1, ip2, len) ((len == 0) || (PREFIX(ip1, len) == PREFIX(ip2, len)))
 
 // Given an incoming Internet datagram, the router decides
 // (1) which interface to send it out on, and
@@ -50,11 +55,8 @@ void Router::route_one_datagram(InternetDatagram &dgram) {
     //       meaning: through interface 3 to 192.168.16.2 (next hop), we can send
     //                our datagram to network set with prefix 172.168 (aka 172.168.any.any)
     // find the longest prefix entry matched with dgram's dst ip adress...
-    //
-    // Note: if no matching, send to the default router!!! It is in the first entry of the router table
-    //       whose entry is [0.0.0.0, 0, next router's ip adress, 0]
-    int16_t max_prefix_len = 0;
-    RouteEntry entry_matched = _route_table[0];
+    RouteEntry entry_matched;
+    int16_t max_prefix_len = -1;  // default len is the smaller than any possible prefix length
     for (auto &entry : _route_table) {
         if (MATCH(dgram.header().dst, entry._route_prefix, entry._prefix_length) &&
             entry._prefix_length > max_prefix_len) {
@@ -63,11 +65,15 @@ void Router::route_one_datagram(InternetDatagram &dgram) {
         }
     }
 
+    // no matching entry....ignore this datagram
+    if (max_prefix_len == -1)
+        return;
+
     // two case:   if entry's next_hop:
     //    1. have value: this inteface connect to a router, send datagram to this router;
     //    2. don't have value: the interface directly connects a host computer's network interface, thus next_hop is
     //    datagram's dst ip
-    if (entry_matched._next_hop.has_value() || entry_matched._interface_num == 0)
+    if (entry_matched._next_hop.has_value())
         _interfaces[entry_matched._interface_num].send_datagram(dgram, entry_matched._next_hop.value());
     else {
         _interfaces[entry_matched._interface_num].send_datagram(dgram, Address::from_ipv4_numeric(dgram.header().dst));
