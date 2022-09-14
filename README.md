@@ -1,12 +1,35 @@
+# CS144 LAB: Write Your Own TCP/IP/Ethernet Protocol Stack
+
+Lab0 ~ Lab7 have been fully implemented and passed all test cases, including:
+
+1. byte_stream in lab0;
+2. stream_reassember in lab1;
+3. tcp_receiver in lab2;
+4. tcp_sender in lab3;
+5. tcp_connection in lab4;
+6. network_interface in lab5;
+7. router in lab6;
+8. experience applications based on your TCP/IP/Ethernet full protocol stack (nothing need to implement, but may find few small bugs not exposed in test cases before) in lab7.
+
+Since the cs144 lab provides us with sufficient infrastructure, we don't need to worry about the reading and writing of the underlying virtual network card tun or tap device, so that we only need to complete some classes offering key functions for our network protocal stack. Although the entire code we need to write is less than 2k lines, it completely involves the key content of HTTP, TCP, IP, and Ethernet (it is a pity that there is no lab for routing table estalishment algorithm). Applications can use our own network protocol stack to communicate with the real outside world (just like netcat and telnet), it is very worthwhile to have a try!!
+
+The lab instruction manuals are very detailed, you can find them in <a href="https://cs144.github.io/">cs144 assignment website </a>.
+
+---
+
+# Below is the origin README of cs144 lab
+
+---
+
 For build prereqs, see [the CS144 VM setup instructions](https://web.stanford.edu/class/cs144/vm_howto).
 
 ## Sponge quickstart
 
 To set up your build directory:
 
-	$ mkdir -p <path/to/sponge>/build
-	$ cd <path/to/sponge>/build
-	$ cmake ..
+    $ mkdir -p <path/to/sponge>/build
+    $ cd <path/to/sponge>/build
+    $ cmake ..
 
 **Note:** all further commands listed below should be run from the `build` dir.
 

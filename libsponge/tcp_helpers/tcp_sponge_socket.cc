@@ -77,7 +77,6 @@ void TCPSpongeSocket<AdaptT>::_initialize_TCP(const TCPConfig &config) {
         _datagram_adapter,
         Direction::In,
         [&] {
-            // cout << "segment arrive..." << endl;
             auto seg = _datagram_adapter.read();
             if (seg) {
                 _tcp->segment_received(move(seg.value()));

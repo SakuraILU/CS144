@@ -30,7 +30,6 @@ void bidirectional_stream_copy(Socket &socket) {
         _input,
         Direction::In,
         [&] {
-            // cout << "write something..." << endl;
             _outbound.write(_input.read(_outbound.remaining_capacity()));
             if (_input.eof()) {
                 _outbound.end_input();
@@ -44,7 +43,6 @@ void bidirectional_stream_copy(Socket &socket) {
         socket,
         Direction::Out,
         [&] {
-            // cout << "stream->socket..." << endl;
             const size_t bytes_to_write = min(max_copy_length, _outbound.buffer_size());
             const size_t bytes_written = socket.write(_outbound.peek_output(bytes_to_write), false);
             _outbound.pop_output(bytes_written);
